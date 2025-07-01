@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Espaço Coder JavaScript</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #23272e;
+            color: #f8f8f2;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #282c34;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px #0006;
+            padding: 32px;
+        }
+        h1 {
+            text-align: center;
+            color: #61dafb;
+        }
+        .snippets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+            justify-content: center;
+        }
+        .snippet-btn {
+            background: #44475a;
+            color: #f8f8f2;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 14px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.2s;
+        }
+        .snippet-btn:hover {
+            background: #6272a4;
+        }
+        #codeArea {
+            width: 100%;
+            min-height: 220px;
+            background: #1e2127;
+            color: #f8f8f2;
+            border: 1px solid #44475a;
+            border-radius: 4px;
+            font-family: 'Fira Mono', 'Consolas', monospace;
+            font-size: 1.1em;
+            padding: 12px;
+            margin-bottom: 16px;
+            resize: vertical;
+            outline: none;
+        }
+        .run-btn {
+            background: #61dafb;
+            color: #23272e;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 24px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-bottom: 16px;
+            transition: background 0.2s;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .run-btn:hover {
+            background: #21a1f3;
+        }
+        #output {
+            background: #21252b;
+            color: #50fa7b;
+            border: 1px solid #44475a;
+            border-radius: 4px;
+            min-height: 60px;
+            padding: 10px;
+            font-family: 'Fira Mono', 'Consolas', monospace;
+            white-space: pre-wrap;
+            margin-top: 8px;
+        }
+        label {
+            color: #bd93f9;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Canvas de Código JavaScript</h1>
+        <div class="snippets">
+            <button class="snippet-btn" data-snippet="console.log('Hello, world!');">console.log</button>
+            <button class="snippet-btn" data-snippet="for (let i = 0; i < 5; i++) {\n  \n}">for loop</button>
+            <button class="snippet-btn" data-snippet="if (true) {\n  \n}">if</button>
+            <button class="snippet-btn" data-snippet="function nomeFuncao() {\n  \n}">function</button>
+            <button class="snippet-btn" data-snippet="let variavel = ;">let</button>
+            <button class="snippet-btn" data-snippet="const constante = ;">const</button>
+            <button class="snippet-btn" data-snippet="return ;">return</button>
+            <button class="snippet-btn" data-snippet="while (condicao) {\n  \n}">while</button>
+            <button class="snippet-btn" data-snippet="try {\n  \n} catch (e) {\n  \n}">try/catch</button>
+        </div>
+        <label for="codeArea">Seu código JavaScript:</label>
+        <textarea id="codeArea" spellcheck="false" placeholder="// Escreva seu código aqui..."></textarea>
+        <button class="run-btn" id="runBtn">Executar Código</button>
+        <label for="output">Saída:</label>
+        <div id="output"></div>
+    </div>
+    <script>
+        // Inserção de snippets
+        document.querySelectorAll('.snippet-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const snippet = btn.getAttribute('data-snippet');
+                const textarea = document.getElementById('codeArea');
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const before = textarea.value.substring(0, start);
+                const after = textarea.value.substring(end);
+                textarea.value = before + snippet + after;
+                textarea.focus();
+                textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
+            });
+        });
+
+        // Execução do código
+        document.getElementById('runBtn').addEventListener('click', () => {
+            const code = document.getElementById('codeArea').value;
+            const output = document.getElementById('output');
+            output.textContent = '';
+            try {
+                // Captura console.log
+                let logs = [];
+                const originalLog = console.log;
+                console.log = function(...args) {
+                    logs.push(args.join(' '));
+                    originalLog.apply(console, args);
+                };
+                let result = eval(code);
+                if (logs.length > 0) {
+                    output.textContent = logs.join('\n');
+                } else if (result !== undefined) {
+                    output.textContent = result;
+                } else {
+                    output.textContent = 'Código executado.';
+                }
+                console.log = originalLog;
+            } catch (e) {
+                output.textContent = 'Erro: ' + e.message;
+                output.style.color = '#ff5555';
+                setTimeout(() => output.style.color = '#50fa7b', 2000);
+            }
+        });
+    </script>
+</body>
+</html>
